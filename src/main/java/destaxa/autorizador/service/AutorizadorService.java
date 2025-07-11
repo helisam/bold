@@ -39,7 +39,7 @@ public class AutorizadorService {
         
         if (request.getValor() > 1000.00) {
             logger.warn("Transação com valor acima do limite permitido: {}", request.getValor());
-            throw new TransactionProcessingException("Timeout simulado para valores acima de R$1000,00");
+            throw new TransactionProcessingException("Timeout simulado para valores acima de R$1000,00. Limite máximo permitido: R$1000,00");
         }
 
         response.setCodigoMensagem("0210");

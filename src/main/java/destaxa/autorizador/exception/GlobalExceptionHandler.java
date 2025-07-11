@@ -70,6 +70,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TransactionProcessingException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ResponseEntity<ErrorResponse> handleTransactionProcessingException(TransactionProcessingException ex, WebRequest request) {
+        // Log da exceção para fins de monitoramento
+        System.out.println("Erro no processamento da transação: " + ex.getMessage());
+        
         ErrorResponse errorResponse = new ErrorResponse(
                 LocalDateTime.now(),
                 HttpStatus.UNPROCESSABLE_ENTITY.value(),
@@ -77,6 +80,13 @@ public class GlobalExceptionHandler {
                 ex.getMessage(),
                 request.getDescription(false)
         );
+        
+        // Adicionar detalhes adicionais sobre o erro
+        Map<String, Object> additionalInfo = new HashMap<>();
+        additionalInfo.put("limitValue", 1000.00);
+        additionalInfo.put("errorType", "TRANSACTION_TIMEOUT");
+        errorResponse.setAdditionalDetails(additionalInfo);
+        
         return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }

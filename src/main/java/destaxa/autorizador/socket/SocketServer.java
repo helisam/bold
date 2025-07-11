@@ -1,5 +1,6 @@
 package destaxa.autorizador.socket;
 
+import destaxa.autorizador.dto.TransacaoResponseDTO;
 import destaxa.autorizador.service.AutorizadorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,9 +79,37 @@ public class SocketServer {
             logger.debug("Mensagem recebida: {}", mensagemISO8583);
 
             if (mensagemISO8583 != null && !mensagemISO8583.isEmpty()) {
-                String resposta = autorizadorService.processarMensagem(mensagemISO8583);
-                out.println(resposta);
-                logger.debug("Resposta enviada: {}", resposta);
+                try {
+                    String resposta = autorizadorService.processarMensagem(mensagemISO8583);
+                    out.println(resposta);
+                    logger.debug("Resposta enviada: {}", resposta);
+                } catch (destaxa.autorizador.exception.TransactionProcessingException e) {
+                    // Criar uma resposta de erro para transações com valor acima do limite
+                    logger.warn("Erro no processamento da transação: {}", e.getMessage());
+                    
+                    // Extrair os dados da mensagem original para construir a resposta
+                    String[] campos = mensagemISO8583.split("\\|");
+                    String valor = campos.length > 3 ? campos[3] : "0.00";
+                    String nsu = campos.length > 6 ? campos[6] : "UNKNOWN";
+                    String codigoEstabelecimento = campos.length > 7 ? campos[7] : "123456789";
+                    
+                    // Construir resposta de erro com os dados da transação original
+                    TransacaoResponseDTO errorResponse = new TransacaoResponseDTO();
+                    errorResponse.setCodigoMensagem("0210");
+                    errorResponse.setValor(Double.parseDouble(valor));
+                    errorResponse.setDataTransacao(java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("MMdd")));
+                    errorResponse.setHoraTransacao(java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HHmmss")));
+                    errorResponse.setNsu(nsu);
+                    errorResponse.setCodigoAutorizacao("000000"); // Código de autorização padrão para erro
+                    errorResponse.setCodigoResposta("051"); // Código de resposta para transação recusada
+                    errorResponse.setCodigoEstabelecimento(codigoEstabelecimento);
+                    errorResponse.setNsuHost(String.format("%06d", (int) (Math.random() * 1000000)));
+                    
+                    // Converter para formato ISO8583 usando o parser
+                    String respostaErro = destaxa.autorizador.util.ISO8583Parser.parseToISO8583(errorResponse);
+                    out.println(respostaErro);
+                    logger.debug("Resposta de erro enviada: {}", respostaErro);
+                }
             }
 
         } catch (IOException e) {

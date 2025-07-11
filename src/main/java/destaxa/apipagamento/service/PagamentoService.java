@@ -3,6 +3,7 @@ package destaxa.apipagamento.service;
 import destaxa.apipagamento.client.AutorizadorClient;
 import destaxa.apipagamento.dto.AuthorizationRequest;
 import destaxa.apipagamento.dto.AuthorizationResponse;
+import destaxa.apipagamento.exception.TransactionProcessingException;
 import destaxa.apipagamento.util.ISO8583Helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,12 @@ public class PagamentoService {
 
     public AuthorizationResponse processarAutorizacao(AuthorizationRequest request) {
         logger.info("Iniciando processamento de autorização para NSU: {}", request.getExternalId());
+        
+        // Validar valor máximo
+        if (request.getValue() > 1000.00) {
+            logger.warn("Transação com valor acima do limite permitido: {}", request.getValue());
+            throw new TransactionProcessingException("Timeout simulado para valores acima de R$1000,00");
+        }
         
         // Converter para mensagem ISO8583
         logger.debug("Convertendo requisição para formato ISO8583");

@@ -1,6 +1,8 @@
 package destaxa.autorizador.exception;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ErrorResponse {
     private LocalDateTime timestamp;
@@ -8,6 +10,7 @@ public class ErrorResponse {
     private String error;
     private String message;
     private String path;
+    private Map<String, Object> additionalDetails;
 
     public ErrorResponse(LocalDateTime timestamp, int status, String error, String message, String path) {
         this.timestamp = timestamp;
@@ -15,6 +18,7 @@ public class ErrorResponse {
         this.error = error;
         this.message = message;
         this.path = path;
+        this.additionalDetails = new HashMap<>();
     }
 
     public LocalDateTime getTimestamp() {
@@ -55,5 +59,13 @@ public class ErrorResponse {
 
     public void setPath(String path) {
         this.path = path;
+    }
+    
+    public Map<String, Object> getAdditionalDetails() {
+        return additionalDetails;
+    }
+    
+    public void setAdditionalDetails(Map<String, Object> additionalDetails) {
+        this.additionalDetails = additionalDetails;
     }
 }
