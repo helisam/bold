@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  api-pagamento:
+    build:
+      context: .
+      dockerfile: api-pagamento/Dockerfile
+    ports:
+      - "8082:8080"
+    depends_on:
+      - autorizador
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+  autorizador:
+    build:
+      context: .
+      dockerfile: autorizador/Dockerfile
+    ports:
+      - "8083:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker

@@ -1,0 +1,3 @@
+rootProject.name = 'destaxa-challenge'
+include 'autorizador'
+include 'api-pagamento'
