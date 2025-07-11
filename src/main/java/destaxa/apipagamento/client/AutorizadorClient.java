@@ -1,5 +1,6 @@
 package destaxa.apipagamento.client;
 
+import destaxa.apipagamento.exception.CommunicationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +54,7 @@ public class AutorizadorClient {
             return resposta;
         } catch (IOException e) {
             logger.error("Erro ao comunicar com o autorizador: {}", e.getMessage());
-            throw new RuntimeException("Erro ao comunicar com o autorizador", e);
+            throw new CommunicationException("Erro ao comunicar com o autorizador", e);
         }
     }
 }

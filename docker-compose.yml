@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: api-pagamento/Dockerfile
     ports:
-      - "8082:8080"
+      - "8082:8081"
     depends_on:
       - autorizador
     environment:
@@ -18,5 +18,6 @@ services:
       dockerfile: autorizador/Dockerfile
     ports:
       - "8083:8080"
+      - "9999:9999"
     environment:
       SPRING_PROFILES_ACTIVE: docker
